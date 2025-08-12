@@ -57,11 +57,12 @@ public class AuthController {
 
         User user = userOpt.get();
         user.setPassword(passwordEncoder.encode(req.getPassword()));
-        user.setVerified(true);
+        user.setVerified(true);  // mark user as verified after password set
         userRepository.save(user);
 
         return ResponseEntity.ok("Password set successfully. You can now log in.");
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Validated @RequestBody LoginRequest req) {
@@ -75,6 +76,41 @@ public class AuthController {
         }
 
         String token = jwtUtil.generateToken(req.getEmail());
-        return ResponseEntity.ok(new LoginResponse(token, "Bearer"));
+
+        // fetch user ID from DB by email
+        Optional<User> userOpt = userRepository.findByEmail(req.getEmail());
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("User not found");
+        }
+
+        Long userId = userOpt.get().getId();
+
+        return ResponseEntity.ok(new LoginResponse(token, "Bearer", userId));
     }
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            return ResponseEntity.badRequest().body("Email already exists");
+        }
+        if (userRepository.existsByPhone(request.getPhone())) {
+            return ResponseEntity.badRequest().body("Phone already exists");
+        }
+
+        User user = User.builder()
+                .fname(request.getFirstname())
+                .lname(request.getLastname())
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .city(request.getCity())
+                .country(request.getCountry())
+                .password(null)           // No password at registration
+                .verified(false)          // Mark as unverified
+                .build();
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok("User registered successfully");
+    }
+
 }

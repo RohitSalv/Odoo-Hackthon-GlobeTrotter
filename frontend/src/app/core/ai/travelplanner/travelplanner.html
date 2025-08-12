@@ -1,0 +1,297 @@
+<app-header></app-header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Itinerary Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-4xl">
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-2">AI-Powered Itinerary Generator</h1>
+            <p class="text-center text-gray-500 mb-8">Enter your travel details and let AI craft the perfect trip for you.</p>
+
+            <div class="space-y-6">
+                <div>
+                    <label for="destination" class="block text-sm font-medium text-gray-700 mb-1">Destination</label>
+                    <input type="text" id="destination" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Paris, France">
+                </div>
+                <div>
+                    <label for="duration" class="block text-sm font-medium text-gray-700 mb-1">Trip Duration (days)</label>
+                    <input type="number" id="duration" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., 3" min="1">
+                </div>
+                <div>
+                    <label for="interests" class="block text-sm font-medium text-gray-700 mb-1">Interests</label>
+                    <input type="text" id="interests" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., art, history, food">
+                </div>
+                 <div>
+                    <label for="budget" class="block text-sm font-medium text-gray-700 mb-1">Budget</label>
+                    <select id="budget" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="budget-friendly">Budget-Friendly</option>
+                        <option value="mid-range">Mid-Range</option>
+                        <option value="luxury">Luxury</option>
+                    </select>
+                </div>
+                <button id="generateBtn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition duration-300">
+                    Generate Itinerary
+                </button>
+            </div>
+        </div>
+
+        <div id="itineraryResult" class="mt-8 bg-white rounded-2xl shadow-lg p-6 md:p-8" style="display: none;">
+            <h2 class="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-6">Your Custom Itinerary</h2>
+            <div id="loader" class="loader" style="display: none;"></div>
+            <div id="itineraryContent" class="prose max-w-none prose-indigo"></div>
+            
+            <!-- New Feature Buttons -->
+            <div id="extraFeatures" class="mt-8 pt-6 border-t border-gray-200 space-y-4" style="display: none;">
+                <h3 class="text-xl font-bold text-center text-gray-800">✨ Enhance Your Trip</h3>
+                 <div class="flex flex-col sm:flex-row gap-4">
+                    <button id="packingBtn" class="w-full bg-green-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300">Generate Packing List</button>
+                    <button id="etiquetteBtn" class="w-full bg-purple-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-600 transition duration-300">Get Cultural Tips</button>
+                </div>
+            </div>
+
+            <!-- New Feature Content Areas -->
+            <div id="packingResult" class="mt-6" style="display: none;">
+                 <h4 class="text-lg font-semibold text-gray-800 mb-2">Suggested Packing List:</h4>
+                 <div id="packingLoader" class="loader" style="display: none;"></div>
+                 <div id="packingContent" class="prose max-w-none prose-sm"></div>
+            </div>
+             <div id="etiquetteResult" class="mt-6" style="display: none;">
+                 <h4 class="text-lg font-semibold text-gray-800 mb-2">Cultural Etiquette Tips:</h4>
+                 <div id="etiquetteLoader" class="loader" style="display: none;"></div>
+                 <div id="etiquetteContent" class="prose max-w-none prose-sm"></div>
+            </div>
+        </div>
+         <div id="error-message" class="mt-4 text-red-500 text-center" style="display: none;"></div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        // IMPORTANT: Replace with your actual Gemini API key
+        const GEMINI_API_KEY = "AIzaSyAupU0uVG0g2sy63GAMpJqtBbdGxUbNcPQ";
+
+        // --- DOM ELEMENTS ---
+        const generateBtn = document.getElementById('generateBtn');
+        const destinationInput = document.getElementById('destination');
+        const durationInput = document.getElementById('duration');
+        const interestsInput = document.getElementById('interests');
+        const budgetInput = document.getElementById('budget');
+        const itineraryResultDiv = document.getElementById('itineraryResult');
+        const itineraryContentDiv = document.getElementById('itineraryContent');
+        const loader = document.getElementById('loader');
+        const errorMessageDiv = document.getElementById('error-message');
+        
+        // New Feature DOM Elements
+        const extraFeaturesDiv = document.getElementById('extraFeatures');
+        const packingBtn = document.getElementById('packingBtn');
+        const etiquetteBtn = document.getElementById('etiquetteBtn');
+        const packingResultDiv = document.getElementById('packingResult');
+        const packingLoader = document.getElementById('packingLoader');
+        const packingContentDiv = document.getElementById('packingContent');
+        const etiquetteResultDiv = document.getElementById('etiquetteResult');
+        const etiquetteLoader = document.getElementById('etiquetteLoader');
+        const etiquetteContentDiv = document.getElementById('etiquetteContent');
+
+
+        // --- EVENT LISTENERS ---
+        generateBtn.addEventListener('click', handleGenerateItinerary);
+        packingBtn.addEventListener('click', handleGeneratePackingList);
+        etiquetteBtn.addEventListener('click', handleGenerateEtiquette);
+
+        // --- CORE FUNCTIONS ---
+
+        /**
+         * Main function to handle the itinerary generation process.
+         */
+        async function handleGenerateItinerary() {
+            // 1. Get user input
+            const destination = destinationInput.value;
+            const duration = durationInput.value;
+            const interests = interestsInput.value;
+            const budget = budgetInput.value;
+
+            // 2. Validate input
+            if (!destination || !duration || !interests) {
+                showError("Please fill in all fields.");
+                return;
+            }
+             if (GEMINI_API_KEY === "YOUR_GEMINI_API_KEY") {
+                showError("Please replace the placeholder GEMINI_API_KEY in the script with your actual key.");
+                return;
+            }
+
+
+            // 3. Show loading state and hide previous results
+            itineraryResultDiv.style.display = 'block';
+            loader.style.display = 'block';
+            itineraryContentDiv.innerHTML = '';
+            extraFeaturesDiv.style.display = 'none';
+            packingResultDiv.style.display = 'none';
+            etiquetteResultDiv.style.display = 'none';
+            hideError();
+
+            try {
+                // 4. Generate itinerary using Gemini API
+                const itineraryPrompt = `Create a detailed, day-by-day travel itinerary for a trip to ${destination}.
+                    **Trip Details:**
+                    - Duration: ${duration} days
+                    - Interests: ${interests}
+                    - Budget: ${budget}
+
+                    **Instructions:**
+                    1.  Create a logical and efficient itinerary for each day based on the interests.
+                    2.  Suggest specific attractions, restaurants, and activities available in ${destination}.
+                    3.  Group attractions that are geographically close to each other to minimize travel time.
+                    4.  Provide a morning, afternoon, and evening plan for each day.
+                    5.  Suggest 1-2 meal options (breakfast, lunch, dinner) per day that fit the specified budget.
+                    6.  Make the itinerary sound exciting and engaging.
+                    7.  Format the output clearly with headings for each day. Do not use markdown.`;
+                
+                const itinerary = await generateTextWithGemini(itineraryPrompt);
+
+                // 5. Display the result
+                itineraryContentDiv.innerHTML = itinerary.replace(/\n/g, '<br>');
+                extraFeaturesDiv.style.display = 'block';
+
+
+            } catch (error) {
+                console.error("Error generating itinerary:", error);
+                showError("An error occurred while generating the itinerary. Please check the console for details.");
+            } finally {
+                // 6. Hide loading state
+                loader.style.display = 'none';
+            }
+        }
+        
+        /**
+         * Handles the generation of the packing list.
+         */
+        async function handleGeneratePackingList() {
+            const destination = destinationInput.value;
+            const duration = durationInput.value;
+            const interests = interestsInput.value;
+
+            packingResultDiv.style.display = 'block';
+            packingLoader.style.display = 'block';
+            packingContentDiv.innerHTML = '';
+
+            try {
+                const prompt = `Generate a practical packing list for a ${duration}-day trip to ${destination}. The traveler's interests are ${interests}. Consider the typical climate of the destination. Organize the list into categories like 'Clothing', 'Toiletries', 'Electronics', and 'Documents'.`;
+                const packingList = await generateTextWithGemini(prompt);
+                packingContentDiv.innerHTML = packingList.replace(/\n/g, '<br>');
+            } catch (error) {
+                 console.error("Error generating packing list:", error);
+                 packingContentDiv.innerHTML = `<p class="text-red-500">Could not generate packing list.</p>`;
+            } finally {
+                packingLoader.style.display = 'none';
+            }
+        }
+
+        /**
+         * Handles the generation of cultural etiquette tips.
+         */
+        async function handleGenerateEtiquette() {
+            const destination = destinationInput.value;
+            
+            etiquetteResultDiv.style.display = 'block';
+            etiquetteLoader.style.display = 'block';
+            etiquetteContentDiv.innerHTML = '';
+
+            try {
+                const prompt = `Provide a list of essential cultural etiquette tips for a tourist visiting ${destination}. Focus on topics like greetings, dining, tipping, and general social conduct. Keep the tips concise and easy to understand.`;
+                const etiquetteTips = await generateTextWithGemini(prompt);
+                etiquetteContentDiv.innerHTML = etiquetteTips.replace(/\n/g, '<br>');
+            } catch (error) {
+                console.error("Error generating etiquette tips:", error);
+                etiquetteContentDiv.innerHTML = `<p class="text-red-500">Could not generate cultural tips.</p>`;
+            } finally {
+                etiquetteLoader.style.display = 'none';
+            }
+        }
+
+        /**
+         * Generic function to generate text using the Google Gemini API.
+         * @param {string} prompt - The prompt to send to the Gemini API.
+         * @returns {Promise<string>} A promise that resolves to the formatted text response.
+         */
+        async function generateTextWithGemini(prompt) {
+            // FIX: Updated the model from 'gemini-pro' to 'gemini-1.5-flash-latest' to resolve the 404 Not Found error.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+
+            const payload = {
+                contents: [{
+                    parts: [{
+                        text: prompt
+                    }]
+                }]
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Gemini API request failed with status ${response.status}`);
+            }
+
+            const data = await response.json();
+             if (data.candidates && data.candidates.length > 0 && data.candidates[0].content.parts.length > 0) {
+                return data.candidates[0].content.parts[0].text;
+            } else {
+                if (data.promptFeedback && data.promptFeedback.blockReason) {
+                     throw new Error(`Request was blocked by the Gemini API. Reason: ${data.promptFeedback.blockReason}`);
+                }
+                throw new Error("The Gemini API returned an empty or invalid response.");
+            }
+        }
+
+
+        // --- HELPER FUNCTIONS ---
+
+         /**
+         * Displays an error message to the user.
+         * @param {string} message - The error message to display.
+         */
+        function showError(message) {
+            errorMessageDiv.textContent = message;
+            errorMessageDiv.style.display = 'block';
+        }
+
+        /**
+         * Hides the error message.
+         */
+        function hideError() {
+            errorMessageDiv.style.display = 'none';
+        }
+
+    </script>
+</body>
+</html>

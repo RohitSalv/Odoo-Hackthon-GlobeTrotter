@@ -1,0 +1,133 @@
+<app-header></app-header>
+<div class="max-w-5xl mx-auto p-6 space-y-10 bg-white rounded-lg shadow-md">
+
+  <!-- Stops Section -->
+  <section class="stops-section">
+    <h2 class="text-2xl font-semibold mb-5 text-gray-800">Trip Stops</h2>
+
+    <form [formGroup]="stopForm" (ngSubmit)="addOrUpdateStop()" class="space-y-4 bg-gray-50 p-6 rounded-lg shadow-inner">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <input type="text" formControlName="city" placeholder="City" 
+               class="input-field" />
+        <input type="text" formControlName="country" placeholder="Country" 
+               class="input-field" />
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <input type="date" formControlName="startDate" placeholder="Start Date" 
+               class="input-field" />
+        <input type="date" formControlName="endDate" placeholder="End Date" 
+               class="input-field" />
+      </div>
+      <input type="number" formControlName="orderIndex" placeholder="Order" min="1" 
+             class="input-field" />
+      <textarea formControlName="description" placeholder="Description" rows="3" 
+                class="input-field resize-none"></textarea>
+
+      <div class="flex gap-3">
+        <button type="submit" 
+                [disabled]="stopForm.invalid"
+                class="btn-primary flex-grow">
+          {{ editStopId ? 'Update Stop' : 'Add Stop' }}
+        </button>
+        <button type="button" 
+                *ngIf="editStopId" 
+                (click)="cancelEdit()" 
+                class="btn-secondary">
+          Cancel
+        </button>
+      </div>
+    </form>
+
+    <ul class="mt-6 space-y-3">
+      <li *ngFor="let stop of stops" 
+          (click)="selectStop(stop.id!)" 
+          [class.bg-indigo-50]="stop.id === selectedStopId"
+          tabindex="0"
+          role="button"
+          (keydown.enter)="selectStop(stop.id!)"
+          class="flex justify-between items-center p-4 border border-gray-200 rounded-lg shadow-sm cursor-pointer hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+        
+        <div>
+          <strong class="text-lg text-indigo-700">{{ stop.city }}, {{ stop.country }}</strong>
+          <p class="text-sm text-gray-600">
+            ({{ stop.startDate | date:'mediumDate' }} - {{ stop.endDate | date:'mediumDate' }})
+          </p>
+        </div>
+
+        <div class="flex gap-2">
+          <button (click)="startEdit(stop); $event.stopPropagation()" 
+                  class="btn-sm btn-edit" aria-label="Edit stop">
+            Edit
+          </button>
+          <button (click)="deleteStop(stop.id); $event.stopPropagation()" 
+                  class="btn-sm btn-delete" aria-label="Delete stop">
+            Delete
+          </button>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Activities Section -->
+  <section *ngIf="selectedStopId" class="activities-section">
+    <h2 class="text-2xl font-semibold mb-5 text-gray-800">Activities for Stop ID: {{ selectedStopId }}</h2>
+
+    <form [formGroup]="activityForm" (ngSubmit)="addActivity()" class="space-y-4 bg-gray-50 p-6 rounded-lg shadow-inner">
+      <input type="text" formControlName="name" placeholder="Activity Name" class="input-field" />
+      <textarea formControlName="description" placeholder="Description" rows="3" class="input-field resize-none"></textarea>
+      <input type="text" formControlName="type" placeholder="Type" class="input-field" />
+      <input type="number" formControlName="cost" placeholder="Cost" min="0" class="input-field" />
+      <input type="number" formControlName="duration" placeholder="Duration (hours)" min="0" class="input-field" />
+      <input type="text" formControlName="imageUrl" placeholder="Image URL" class="input-field" />
+
+      <button type="submit" [disabled]="activityForm.invalid" class="btn-primary w-full">
+        Add Activity
+      </button>
+    </form>
+  </section>
+
+  <!-- Budget Section -->
+  <section class="budget-section">
+    <h2 class="text-2xl font-semibold mb-5 text-gray-800">Trip Budget</h2>
+
+    <form [formGroup]="budgetForm" (ngSubmit)="saveBudget()" class="space-y-4 bg-gray-50 p-6 rounded-lg shadow-inner">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+        <label for="transportCost" class="font-medium text-gray-700">Transport Cost:</label>
+        <input id="transportCost" type="number" formControlName="transportCost" min="0" class="input-field" />
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+        <label for="stayCost" class="font-medium text-gray-700">Stay Cost:</label>
+        <input id="stayCost" type="number" formControlName="stayCost" min="0" class="input-field" />
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+        <label for="activitiesCost" class="font-medium text-gray-700">Activities Cost:</label>
+        <input id="activitiesCost" type="number" formControlName="activitiesCost" min="0" class="input-field" />
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+        <label for="mealsCost" class="font-medium text-gray-700">Meals Cost:</label>
+        <input id="mealsCost" type="number" formControlName="mealsCost" min="0" class="input-field" />
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+        <label for="totalCost" class="font-medium text-gray-700">Total Cost:</label>
+        <input id="totalCost" type="number" formControlName="totalCost" readonly class="input-field bg-gray-200 cursor-not-allowed" />
+      </div>
+
+      <button type="submit" [disabled]="budgetForm.invalid" class="btn-primary w-full">
+        Save Budget
+      </button>
+    </form>
+  </section>
+
+  <!-- Messages -->
+  <div *ngIf="success" class="mt-4 p-4 bg-green-100 text-green-800 rounded shadow">
+    {{ success }}
+  </div>
+  <div *ngIf="error" class="mt-4 p-4 bg-red-100 text-red-800 rounded shadow">
+    {{ error }}
+  </div>
+
+</div>

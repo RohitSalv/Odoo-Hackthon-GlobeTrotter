@@ -1,0 +1,138 @@
+.itinerary-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  font-family: Arial, sans-serif;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+h2 {
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 0.3rem;
+  color: #007bff;
+}
+
+.form-group input,
+.form-group textarea {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+button {
+  cursor: pointer;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+button[disabled] {
+  background-color: #a0a0a0;
+  cursor: not-allowed;
+}
+
+button:hover:not([disabled]) {
+  background-color: #0056b3;
+}
+
+.stops-list {
+  list-style: none;
+  padding: 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.stops-list li {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.stops-list li:last-child {
+  border-bottom: none;
+}
+
+.stops-list li.selected {
+  background-color: #d0e7ff;
+}
+
+.stops-list li button {
+  margin-left: 0.5rem;
+  background-color: #6c757d;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.9rem;
+}
+
+.stops-list li button:hover {
+  background-color: #5a6268;
+}
+
+.budget-form {
+  max-width: 400px;
+}
+
+.budget-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.budget-row label {
+  flex: 1;
+  margin-right: 0.5rem;
+  font-weight: 600;
+}
+
+.budget-row input {
+  flex: 1;
+  max-width: 150px;
+}
+
+.message {
+  padding: 1rem;
+  border-radius: 5px;
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.message.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}

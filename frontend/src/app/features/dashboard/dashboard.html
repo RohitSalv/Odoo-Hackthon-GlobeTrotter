@@ -1,0 +1,42 @@
+<app-header></app-header>
+<section
+  class="relative bg-cover bg-center bg-no-repeat py-32 px-4"
+  [ngStyle]="{
+    'background-image':
+      'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(' + backgroundImage + ')'
+  }"
+>
+  <div class="max-w-7xl mx-auto text-center text-white">
+    <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+      Plan Your Perfect
+      <span class="block text-blue-400">Adventure</span>
+    </h1>
+
+    <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed">
+      Create detailed itineraries, manage budgets, and discover amazing
+      destinations with our comprehensive travel planning platform.
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <button
+      routerLink="/plan-trip"
+        type="button"
+        class="inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 whitespace-nowrap cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-sm hover:shadow-md px-8 py-4 text-lg"
+      >
+        <i class="ri-rocket-line mr-2"></i>
+        Start Planning
+      </button>
+
+      <button
+       routerLink="/search"
+        type="button"
+        class="inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 whitespace-nowrap cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-blue-500 px-8 py-4 text-lg bg-white/10 border-white/30 text-white hover:bg-white/20"
+      >
+        <i class="ri-search-line mr-2"></i>
+        Explore Destinations
+      </button>
+    </div>
+  </div>
+</section>
+<app-ai-links></app-ai-links>
+<app-trip-list></app-trip-list>

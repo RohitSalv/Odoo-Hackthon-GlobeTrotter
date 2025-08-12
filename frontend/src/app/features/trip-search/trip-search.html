@@ -1,0 +1,48 @@
+<app-header></app-header>
+<div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg border-l border-r border-gray-300 p-6">
+
+  <div class="flex flex-wrap gap-4 mb-6 items-center">
+
+    <input
+      type="text"
+      placeholder="Search trips..."
+      [(ngModel)]="searchQuery"
+      (input)="onSearchChange()"
+      class="flex-grow min-w-[200px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+    />
+
+    <select [(ngModel)]="filterCountry" (change)="onFilterChange()" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+      <option value="">All Countries</option>
+      <option *ngFor="let c of countries" [value]="c">{{ c }}</option>
+    </select>
+
+    <select [(ngModel)]="filterCity" (change)="onFilterChange()" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+      <option value="">All Cities</option>
+      <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
+    </select>
+
+    <select [(ngModel)]="sortBy" (change)="onSortChange()" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+      <option value="">Sort By</option>
+      <option value="city">City</option>
+      <option value="country">Country</option>
+      <option value="startDate">Start Date</option>
+      <option value="endDate">End Date</option>
+    </select>
+  </div>
+
+  <div *ngIf="tripStops.length > 0; else noResults" class="space-y-4">
+    <div *ngFor="let stop of tripStops" class="p-4 border border-gray-300 rounded-lg shadow hover:shadow-md transition cursor-pointer">
+      <h3 class="text-xl font-semibold text-gray-800 mb-1">{{ stop.city }}, {{ stop.country }}</h3>
+      <p class="text-gray-700 mb-2">{{ stop.description }}</p>
+      <p class="text-sm text-gray-500">
+        <strong>From:</strong> {{ stop.startDate | date:'mediumDate' }}
+        <strong class="ml-4">To:</strong> {{ stop.endDate | date:'mediumDate' }}
+      </p>
+    </div>
+  </div>
+
+  <ng-template #noResults>
+    <p class="text-center text-gray-600 italic">No trip stops found matching criteria.</p>
+  </ng-template>
+
+</div>

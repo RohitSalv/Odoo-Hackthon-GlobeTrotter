@@ -1,0 +1,44 @@
+
+<!-- Loading State -->
+<div *ngIf="loading" class="p-6 text-center text-gray-600 italic select-none">
+  Loading trips, please wait...
+</div>
+
+<!-- Error State -->
+
+
+<!-- No Trips Found -->
+<div *ngIf="!loading && !error && trips.length === 0" class="p-6 text-center text-gray-500">
+  No trips available at the moment.
+</div>
+
+<!-- Trips Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 p-6">
+  <div
+    *ngFor="let trip of trips"
+    (click)="onTripClick(trip.id!)"
+    tabindex="0"
+    role="button"
+    (keydown.enter)="onTripClick(trip.id!)"
+    class="bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg cursor-pointer transition-shadow duration-300 flex flex-col overflow-hidden focus:outline-none focus:ring-2 focus:ring-indigo-500"
+  >
+    <img
+      [src]="trip.coverImageUrl || 'assets/default-trip.jpg'"
+      alt="{{ trip.name }}"
+      class="w-full h-48 object-cover rounded-t-lg"
+      loading="lazy"
+    />
+    <div class="p-4 flex flex-col flex-grow">
+      <h3 class="text-xl font-semibold mb-2 text-gray-900 truncate" title="{{ trip.name }}">
+        {{ trip.name }}
+      </h3>
+      <p class="text-gray-700 flex-grow line-clamp-3 mb-3">
+        {{ trip.description || 'No description available.' }}
+      </p>
+      <p class="text-sm text-gray-500 font-mono tracking-wide">
+        <time [attr.datetime]="trip.startDate">{{ trip.startDate | date: 'mediumDate' }}</time> — 
+        <time [attr.datetime]="trip.endDate">{{ trip.endDate | date: 'mediumDate' }}</time>
+      </p>
+    </div>
+  </div>
+</div>
