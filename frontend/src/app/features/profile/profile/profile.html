@@ -1,1 +1,182 @@
-<p>profile works!</p>
+<app-header></app-header>
+
+<div *ngIf="loading" class="min-h-screen flex justify-center items-center">
+  <p class="text-blue-600 font-semibold">Loading profile...</p>
+</div>
+
+<div *ngIf="error" class="min-h-screen flex justify-center items-center">
+  <p class="text-red-600 font-semibold">{{ error }}</p>
+</div>
+
+<div *ngIf="!loading && !error" class="min-h-screen bg-white flex justify-center items-start py-10 px-4">
+  <div class="max-w-3xl w-full bg-white border border-blue-300 rounded-lg shadow-md p-8">
+
+    <!-- EDIT MODE -->
+    <form *ngIf="editMode" #editForm="ngForm" (ngSubmit)="saveChanges(editForm)" novalidate>
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">First Name</label>
+        <input
+          name="fname"
+          [(ngModel)]="editableUser.fname"
+          #fname="ngModel"
+          required
+          class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          [class.border-red-500]="fname.invalid && fname.touched"
+        />
+        <div *ngIf="fname.invalid && fname.touched" class="text-red-600 text-sm mt-1">First name is required.</div>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Last Name</label>
+        <input
+          name="lname"
+          [(ngModel)]="editableUser.lname"
+          #lname="ngModel"
+          required
+          class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          [class.border-red-500]="lname.invalid && lname.touched"
+        />
+        <div *ngIf="lname.invalid && lname.touched" class="text-red-600 text-sm mt-1">Last name is required.</div>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Phone</label>
+        <input
+          name="phone"
+          [(ngModel)]="editableUser.phone"
+          class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          type="text"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">City</label>
+        <input
+          name="city"
+          [(ngModel)]="editableUser.city"
+          #city="ngModel"
+          required
+          class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          [class.border-red-500]="city.invalid && city.touched"
+          type="text"
+        />
+        <div *ngIf="city.invalid && city.touched" class="text-red-600 text-sm mt-1">City is required.</div>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Country</label>
+        <input
+          name="country"
+          [(ngModel)]="editableUser.country"
+          #country="ngModel"
+          required
+          class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          [class.border-red-500]="country.invalid && country.touched"
+          type="text"
+        />
+        <div *ngIf="country.invalid && country.touched" class="text-red-600 text-sm mt-1">Country is required.</div>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Language Preference</label>
+        <input
+          name="languagePreference"
+          [(ngModel)]="editableUser.languagePreference"
+          class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          type="text"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Additional Info</label>
+        <textarea
+          name="additionalInfo"
+          [(ngModel)]="editableUser.additionalInfo"
+          rows="3"
+          class="mt-1 block w-full rounded border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+        ></textarea>
+      </div>
+
+      <div class="flex space-x-4">
+        <button
+          type="submit"
+          [disabled]="editForm.invalid"
+          class="bg-blue-700 text-white px-5 py-2 rounded hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300"
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          (click)="toggleEdit()"
+          class="bg-gray-400 text-white px-5 py-2 rounded hover:bg-gray-500 focus:outline-none focus:ring-4 focus:ring-gray-300"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+
+    <!-- VIEW MODE -->
+    <div *ngIf="!editMode">
+      <!-- Profile Header -->
+      <div class="flex flex-col sm:flex-row items-center sm:items-start space-y-6 sm:space-y-0 sm:space-x-8">
+        <!-- Profile Image -->
+        <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-blue-500 flex-shrink-0">
+          <img
+            [src]="user.profileImageUrl ? user.profileImageUrl : 'https://via.placeholder.com/150?text=No+Image'"
+            alt="Profile Image"
+            class="w-full h-full object-cover"
+          />
+        </div>
+        <!-- Basic Info -->
+        <div class="flex-1">
+          <h1 class="text-3xl font-bold text-blue-700">{{ user.fname }} {{ user.lname }}</h1>
+          <p class="text-blue-600 font-semibold mt-1">{{ user.type }}</p>
+          <p class="mt-2 text-gray-600">{{ user.email }}</p>
+          <p class="mt-1 text-gray-600">{{ user.phone ? user.phone : 'Phone not provided' }}</p>
+          <p class="mt-1 text-gray-600">{{ user.city }}, {{ user.country }}</p>
+          <p class="mt-1 text-sm text-blue-500 font-medium">
+            Language: {{ user.languagePreference ? user.languagePreference : 'Not specified' }}
+          </p>
+          <p class="mt-1 text-sm">
+            <span class="font-semibold">Verified:</span>
+            <span
+              class="inline-block px-2 py-0.5 rounded text-white text-xs"
+              [ngClass]="user.verified ? 'bg-blue-600' : 'bg-red-600'"
+            >
+              {{ user.verified ? 'Yes' : 'No' }}
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Additional Info Section -->
+      <div class="mt-8 border-t border-blue-200 pt-6">
+        <h2 class="text-xl font-semibold text-blue-700 mb-2">About</h2>
+        <p class="text-gray-700 whitespace-pre-wrap">
+          {{ user.additionalInfo ? user.additionalInfo : 'No additional information provided.' }}
+        </p>
+      </div>
+
+      <!-- Account Metadata -->
+      <div class="mt-8 border-t border-blue-200 pt-6 text-sm text-gray-500">
+        <p><span class="font-semibold">Account Created:</span> {{ user.createdAt | date: 'medium' }}</p>
+        <p><span class="font-semibold">Last Updated:</span> {{ user.updatedAt | date: 'medium' }}</p>
+        <br />
+        <button
+          (click)="toggleEdit()"
+          type="button"
+          class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2"
+        >
+          Edit
+        </button>
+        <button
+          (click)="onLogout()"
+          type="button"
+          class="text-white bg-red-700 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2"
+        >
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

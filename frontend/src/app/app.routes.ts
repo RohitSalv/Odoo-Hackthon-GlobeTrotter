@@ -10,6 +10,8 @@ import { SignupComponent } from './features/auth/signup/signup';
 import { OtpVerifyComponent } from './features/auth/otpverify/otpverify';
 import { Travelplanner } from './core/ai/travelplanner/travelplanner';
 import { Budgetplanner } from './core/ai/budgetplanner/budgetplanner';
+import { Profile } from './features/profile/profile/profile';
+import { AdmninDashboard } from './features/admin/dashboard/dashboard';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -24,6 +26,7 @@ export const routes: Routes = [
   { path: 'verify-otp', component: OtpVerifyComponent },
   { path:'ai', component:Travelplanner},
   { path:'ai2', component:Budgetplanner},
+  { path:"profile", component:Profile},
+  { path:'admin-dashboard',component:AdmninDashboard},
   { path: '**', redirectTo: 'login' },
-  
 ];
